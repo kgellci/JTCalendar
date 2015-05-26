@@ -14,8 +14,12 @@
 
 #define NUMBER_PAGES_LOADED 5 // Must be the same in JTCalendarView, JTCalendarMenuView, JTCalendarContentView
 
-@interface JTCalendarContentView(){
+@interface JTCalendarContentView() <UIGestureRecognizerDelegate>{
     NSMutableArray *monthsViews;
+    UIPanGestureRecognizer *weekMonthPanGesture;
+    NSLayoutConstraint *weekMonthContainerHeightConstraint;
+    CGFloat minHeightForWeekMonthContainerHeightConstraint;
+    CGFloat maxHeightForWeekMonthContainerHeightConstraint;
 }
 
 @end
@@ -149,6 +153,74 @@
     componentsNewDate.weekday = calendar.firstWeekday;
     
     return [calendar dateFromComponents:componentsNewDate];
+}
+
+- (void)enableWeekMonthPanWithMinimumHeight:(CGFloat)minimumHeight andMaximumHeight:(CGFloat)maximumHeight byUpdatingHeightConstraint:(NSLayoutConstraint *)heightConstraint {
+    if (weekMonthPanGesture) {
+        [self removeGestureRecognizer:weekMonthPanGesture];
+    }
+    minHeightForWeekMonthContainerHeightConstraint = minimumHeight;
+    maxHeightForWeekMonthContainerHeightConstraint = maximumHeight;
+    weekMonthContainerHeightConstraint = heightConstraint;
+    weekMonthPanGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleWeekMonthPan:)];
+    weekMonthPanGesture.delegate = self;
+    [self addGestureRecognizer:weekMonthPanGesture];
+}
+
+- (void)handleWeekMonthPan:(UIPanGestureRecognizer *)panGesture {
+    CGPoint translationPoint = [panGesture translationInView:panGesture.view];
+    weekMonthContainerHeightConstraint.constant += translationPoint.y;
+    weekMonthContainerHeightConstraint.constant = MAX(MIN(maxHeightForWeekMonthContainerHeightConstraint, weekMonthContainerHeightConstraint.constant), minHeightForWeekMonthContainerHeightConstraint);
+    CGFloat opacity = 0;
+    if (self.calendarManager.calendarAppearance.isWeekMode) {
+        opacity = 1.0f - (weekMonthContainerHeightConstraint.constant / maxHeightForWeekMonthContainerHeightConstraint);
+    } else {
+        opacity = weekMonthContainerHeightConstraint.constant / maxHeightForWeekMonthContainerHeightConstraint;
+    }
+    
+    self.layer.opacity = opacity + 0.1f;
+    if (panGesture.state == UIGestureRecognizerStateEnded) {
+        if (weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint - minHeightForWeekMonthContainerHeightConstraint) {
+            weekMonthContainerHeightConstraint.constant = minHeightForWeekMonthContainerHeightConstraint;
+        } else {
+            weekMonthContainerHeightConstraint.constant = maxHeightForWeekMonthContainerHeightConstraint;
+        }
+        weekMonthPanGesture.enabled = NO;
+        [UIView animateWithDuration:0.15f animations:^{
+            [self layoutIfNeeded];
+            if (self.calendarManager.calendarAppearance.isWeekMode == weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint) {
+                self.layer.opacity = 1.0f;
+            } else {
+                self.layer.opacity = 0.1f;
+            }
+        } completion:^(BOOL finished) {
+            self.calendarManager.calendarAppearance.isWeekMode = weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint;
+            [self.calendarManager reloadAppearance];
+            weekMonthPanGesture.enabled = YES;
+            [UIView animateWithDuration:.25
+                             animations:^{
+                                 self.layer.opacity = 1;
+                             }];
+        }];
+        return;
+    }
+    
+    [panGesture setTranslation:CGPointZero inView:panGesture.view];
+}
+
+#pragma mark - UIGestureRecognizer Delegate
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if ([gestureRecognizer isEqual:weekMonthPanGesture]) {
+        if (gestureRecognizer.numberOfTouches > 0) {
+            CGPoint translation = [weekMonthPanGesture velocityInView:self];
+            NSLog(@"%d", fabs(translation.y) > fabs(translation.x));
+            return fabs(translation.y) > fabs(translation.x);
+        } else {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 #pragma mark - JTCalendarManager
