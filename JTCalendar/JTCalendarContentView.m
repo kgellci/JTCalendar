@@ -168,17 +168,20 @@
 }
 
 - (void)handleWeekMonthPan:(UIPanGestureRecognizer *)panGesture {
-    CGPoint translationPoint = [panGesture translationInView:panGesture.view];
-    weekMonthContainerHeightConstraint.constant += translationPoint.y;
+    // Setting height constraint to follow pan
+    CGPoint touchOffset = [panGesture translationInView:panGesture.view];
+    weekMonthContainerHeightConstraint.constant += touchOffset.y;
     weekMonthContainerHeightConstraint.constant = MAX(MIN(maxHeightForWeekMonthContainerHeightConstraint, weekMonthContainerHeightConstraint.constant), minHeightForWeekMonthContainerHeightConstraint);
+    
+    // Setting opacity based on pan
     CGFloat opacity = 0;
     if (self.calendarManager.calendarAppearance.isWeekMode) {
         opacity = 1.0f - (weekMonthContainerHeightConstraint.constant / maxHeightForWeekMonthContainerHeightConstraint);
     } else {
-        opacity = weekMonthContainerHeightConstraint.constant / maxHeightForWeekMonthContainerHeightConstraint;
+        opacity = (weekMonthContainerHeightConstraint.constant - minHeightForWeekMonthContainerHeightConstraint) / (maxHeightForWeekMonthContainerHeightConstraint - minHeightForWeekMonthContainerHeightConstraint);
     }
+    self.layer.opacity = opacity;
     
-    self.layer.opacity = opacity + 0.1f;
     if (panGesture.state == UIGestureRecognizerStateEnded) {
         if (weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint - minHeightForWeekMonthContainerHeightConstraint) {
             weekMonthContainerHeightConstraint.constant = minHeightForWeekMonthContainerHeightConstraint;
@@ -186,15 +189,16 @@
             weekMonthContainerHeightConstraint.constant = maxHeightForWeekMonthContainerHeightConstraint;
         }
         weekMonthPanGesture.enabled = NO;
+        BOOL willBecomeWeekMode = weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint;
         [UIView animateWithDuration:0.15f animations:^{
             [self layoutIfNeeded];
-            if (self.calendarManager.calendarAppearance.isWeekMode == weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint) {
+            if (self.calendarManager.calendarAppearance.isWeekMode == willBecomeWeekMode) {
                 self.layer.opacity = 1.0f;
             } else {
-                self.layer.opacity = 0.1f;
+                self.layer.opacity = 0.0f;
             }
         } completion:^(BOOL finished) {
-            self.calendarManager.calendarAppearance.isWeekMode = weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint;
+            self.calendarManager.calendarAppearance.isWeekMode = willBecomeWeekMode;
             [self.calendarManager reloadAppearance];
             weekMonthPanGesture.enabled = YES;
             [UIView animateWithDuration:.25
@@ -212,13 +216,9 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if ([gestureRecognizer isEqual:weekMonthPanGesture]) {
-        if (gestureRecognizer.numberOfTouches > 0) {
-            CGPoint translation = [weekMonthPanGesture velocityInView:self];
-            NSLog(@"%d", fabs(translation.y) > fabs(translation.x));
-            return fabs(translation.y) > fabs(translation.x);
-        } else {
-            return NO;
-        }
+        CGPoint translation = [weekMonthPanGesture velocityInView:self];
+        NSLog(@"%d", fabs(translation.y) > fabs(translation.x));
+        return fabs(translation.y) > fabs(translation.x);
     }
     return YES;
 }
