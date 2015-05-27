@@ -20,7 +20,6 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bLk-nx-MCc" customClass="JTCalendarMenuView">
                                 <rect key="frame" x="0.0" y="20" width="600" height="50"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="wRk-E7-7hS"/>
                                 </constraints>
@@ -54,14 +53,11 @@
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IaV-x3-ghF" customClass="JTCalendarContentView">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="300" id="Kfn-Ge-jpQ"/>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="300" id="mIA-Fh-2AO"/>
                                         </constraints>
                                     </view>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="bottom" secondItem="IaV-x3-ghF" secondAttribute="bottom" id="Ffc-dU-oIe"/>
                                     <constraint firstAttribute="trailing" secondItem="IaV-x3-ghF" secondAttribute="trailing" id="TWo-is-JzA"/>
@@ -97,8 +93,9 @@
                         </variation>
                     </view>
                     <connections>
+                        <outlet property="calendarContainerHeightConstraint" destination="fXl-LW-dQd" id="IRT-da-leM"/>
                         <outlet property="calendarContentView" destination="IaV-x3-ghF" id="VFE-26-7W4"/>
-                        <outlet property="calendarContentViewHeight" destination="fXl-LW-dQd" id="2Qi-5D-ZTB"/>
+                        <outlet property="calendarContentViewHeight" destination="Kfn-Ge-jpQ" id="KXl-Dy-edM"/>
                         <outlet property="calendarMenuView" destination="bLk-nx-MCc" id="exp-NN-C52"/>
                     </connections>
                 </viewController>

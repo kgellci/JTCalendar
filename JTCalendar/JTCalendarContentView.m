@@ -18,6 +18,7 @@
     NSMutableArray *monthsViews;
     UIPanGestureRecognizer *weekMonthPanGesture;
     NSLayoutConstraint *weekMonthContainerHeightConstraint;
+    NSLayoutConstraint *weekMonthContentHeightConstraint;
     CGFloat minHeightForWeekMonthContainerHeightConstraint;
     CGFloat maxHeightForWeekMonthContainerHeightConstraint;
 }
@@ -155,13 +156,14 @@
     return [calendar dateFromComponents:componentsNewDate];
 }
 
-- (void)enableWeekMonthPanWithMinimumHeight:(CGFloat)minimumHeight andMaximumHeight:(CGFloat)maximumHeight byUpdatingHeightConstraint:(NSLayoutConstraint *)heightConstraint {
+- (void)enableWeekMonthPanWithMinimumHeight:(CGFloat)minimumHeight andMaximumHeight:(CGFloat)maximumHeight byUpdatingContainerHeightConstraint:(NSLayoutConstraint *)containerHeightConstraint andContentViewHeightConstraint:(NSLayoutConstraint *)contentViewHeightConstraint {
     if (weekMonthPanGesture) {
         [self removeGestureRecognizer:weekMonthPanGesture];
     }
     minHeightForWeekMonthContainerHeightConstraint = minimumHeight;
     maxHeightForWeekMonthContainerHeightConstraint = maximumHeight;
-    weekMonthContainerHeightConstraint = heightConstraint;
+    weekMonthContainerHeightConstraint = containerHeightConstraint;
+    weekMonthContentHeightConstraint = contentViewHeightConstraint;
     weekMonthPanGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleWeekMonthPan:)];
     weekMonthPanGesture.delegate = self;
     [self addGestureRecognizer:weekMonthPanGesture];
@@ -201,6 +203,7 @@
             self.calendarManager.calendarAppearance.isWeekMode = willBecomeWeekMode;
             [self.calendarManager reloadAppearance];
             weekMonthPanGesture.enabled = YES;
+            weekMonthContentHeightConstraint.constant = weekMonthContainerHeightConstraint.constant;
             [UIView animateWithDuration:.25
                              animations:^{
                                  self.layer.opacity = 1;
