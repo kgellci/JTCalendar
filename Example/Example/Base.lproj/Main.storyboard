@@ -48,7 +48,7 @@
                                     <action selector="didChangeModeTouch" destination="vXZ-lx-hvc" eventType="touchUpInside" id="uEc-Nc-0ds"/>
                                 </connections>
                             </button>
-                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nNj-51-F3M">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nNj-51-F3M">
                                 <rect key="frame" x="0.0" y="70" width="600" height="300"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IaV-x3-ghF" customClass="JTCalendarContentView">

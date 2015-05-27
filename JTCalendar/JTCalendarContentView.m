@@ -182,13 +182,13 @@
     } else {
         opacity = (weekMonthContainerHeightConstraint.constant - minHeightForWeekMonthContainerHeightConstraint) / (maxHeightForWeekMonthContainerHeightConstraint - minHeightForWeekMonthContainerHeightConstraint);
     }
-    self.layer.opacity = opacity;
+    self.layer.opacity = opacity + .15f;
     
     if (panGesture.state == UIGestureRecognizerStateEnded) {
-        if (weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint - minHeightForWeekMonthContainerHeightConstraint) {
-            weekMonthContainerHeightConstraint.constant = minHeightForWeekMonthContainerHeightConstraint;
-        } else {
+        if ([panGesture velocityInView:self].y > 0) {
             weekMonthContainerHeightConstraint.constant = maxHeightForWeekMonthContainerHeightConstraint;
+        } else {
+            weekMonthContainerHeightConstraint.constant = minHeightForWeekMonthContainerHeightConstraint;
         }
         weekMonthPanGesture.enabled = NO;
         BOOL willBecomeWeekMode = weekMonthContainerHeightConstraint.constant < maxHeightForWeekMonthContainerHeightConstraint;
@@ -197,7 +197,7 @@
             if (self.calendarManager.calendarAppearance.isWeekMode == willBecomeWeekMode) {
                 self.layer.opacity = 1.0f;
             } else {
-                self.layer.opacity = 0.0f;
+                self.layer.opacity = 0.15f;
             }
         } completion:^(BOOL finished) {
             self.calendarManager.calendarAppearance.isWeekMode = willBecomeWeekMode;
