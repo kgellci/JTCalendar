@@ -222,6 +222,7 @@
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"kJTCalendarDaySelected" object:self.currentDateSelected];
+    [self.dataSource calendarDidDateSelected:self date:self.currentDateSelected];
 }
 
 - (void)selectPreviousDate {
@@ -233,6 +234,7 @@
         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"kJTCalendarDaySelected" object:self.currentDateSelected];
+    [self.dataSource calendarDidDateSelected:self date:self.currentDateSelected];
 }
 
 - (BOOL)selectedDateIsFocused {
