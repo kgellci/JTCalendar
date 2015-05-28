@@ -220,7 +220,6 @@
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     if ([gestureRecognizer isEqual:weekMonthPanGesture]) {
         CGPoint translation = [weekMonthPanGesture velocityInView:self];
-        NSLog(@"%d", fabs(translation.y) > fabs(translation.x));
         return fabs(translation.y) > fabs(translation.x);
     }
     return YES;
