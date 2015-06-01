@@ -56,7 +56,7 @@
     [self.calendar setMenuMonthsView:self.calendarMenuView];
     [self.calendar setContentView:self.calendarContentView];
     [self.calendar setDataSource:self];
-    [self.calendarContentView enableWeekMonthPanWithMinimumHeight:75 andMaximumHeight:300 byUpdatingContainerHeightConstraint:self.calendarContainerHeightConstraint andContentViewHeightConstraint:self.calendarContentViewHeight];
+    [self.calendarContentView enableWeekMonthPanWithMinimumHeight:78 andMaximumHeight:250 byUpdatingContainerHeightConstraint:self.calendarContainerHeightConstraint andContentViewHeightConstraint:self.calendarContentViewHeight];
     
     [self createRandomEvents];
     
